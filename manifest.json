@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Class Tracker",
     "version": "1.0",
-    "description": "Track and access your classes, assignments, and chat with an AI agent",
+    "description": "Track and access your classes, assignments, and discussions quickly",
     "action": {
       "default_icon": {
         "16": "images/icon16.png",
@@ -10,17 +10,11 @@
         "128": "images/icon128.png"
       }
     },
-    "permissions": ["storage", "sidePanel", "tabs"],
+    "permissions": ["storage", "sidePanel"],
     "side_panel": {
       "default_path": "sidepanel.html"
     },
     "background": {
       "service_worker": "background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ]
+    }
   }

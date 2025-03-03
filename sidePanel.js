@@ -1,803 +1,559 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements - Main View
-    const mainView = document.getElementById('main-view');
+    // DOM elements - Main Views
     const classesContainer = document.getElementById('classes-container');
-    const addClassBtn = document.getElementById('add-class-btn');
-    const editModeBtn = document.getElementById('edit-mode-btn');
-    const addClassForm = document.getElementById('add-class-form');
-    const classNameInput = document.getElementById('class-name');
-    const classUrlInput = document.getElementById('class-url');
-    const saveClassBtn = document.getElementById('save-class-btn');
-    const cancelBtn = document.getElementById('cancel-btn');
+    const classDetail = document.getElementById('class-detail');
+    const assignmentDetail = document.getElementById('assignment-detail');
+    const questionDetail = document.getElementById('question-detail');
     
     // DOM elements - Class Detail View
-    const classDetailView = document.getElementById('class-detail-view');
+    const classTitle = document.getElementById('class-title');
     const backBtn = document.getElementById('back-btn');
-    const classDetailTitle = document.getElementById('class-detail-title');
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    // DOM elements - Assignments Tab
+    const assignmentsTabBtn = document.getElementById('assignments-tab-btn');
+    const chatTabBtn = document.getElementById('chat-tab-btn');
     const assignmentsTab = document.getElementById('assignments-tab');
-    const assignmentsList = document.getElementById('assignments-list');
-    const addAssignmentBtn = document.getElementById('add-assignment-btn');
-    const addAssignmentForm = document.getElementById('add-assignment-form');
-    const assignmentTitleInput = document.getElementById('assignment-title');
-    const assignmentDueDateInput = document.getElementById('assignment-due-date');
-    const assignmentDescriptionInput = document.getElementById('assignment-description');
-    const saveAssignmentBtn = document.getElementById('save-assignment-btn');
-    const cancelAssignmentBtn = document.getElementById('cancel-assignment-btn');
+    const chatTab = document.getElementById('chat-tab');
+    const assignmentsList = document.querySelector('.assignments-list');
     
-    // DOM elements - AI Chat Tab
-    const aiChatTab = document.getElementById('ai-chat-tab');
+    // DOM elements - Chat
     const chatMessages = document.getElementById('chat-messages');
-    const messageInput = document.getElementById('message-input');
-    const sendMessageBtn = document.getElementById('send-message-btn');
+    const chatInputField = document.getElementById('chat-input-field');
+    const sendChatBtn = document.getElementById('send-chat-btn');
     
-    // DOM elements - Assignment Detail View
-    const assignmentDetailView = document.getElementById('assignment-detail-view');
-    const backToAssignmentsBtn = document.getElementById('back-to-assignments-btn');
-    const assignmentDetailTitle = document.getElementById('assignment-detail-title');
-    const assignmentDetailContent = document.getElementById('assignment-detail-content');
-    const questionsList = document.getElementById('questions-list');
-    const addQuestionBtn = document.getElementById('add-question-btn');
-    const addQuestionForm = document.getElementById('add-question-form');
-    const questionTextInput = document.getElementById('question-text');
+    // DOM elements - Assignment Detail
+    const backToClassBtn = document.getElementById('back-to-class-btn');
+    const assignmentTitle = document.getElementById('assignment-title');
+    const assignmentDescription = document.getElementById('assignment-description');
+    const questionsContainer = document.getElementById('questions-container');
+    const newQuestionInput = document.getElementById('new-question-input');
     const postQuestionBtn = document.getElementById('post-question-btn');
-    const cancelQuestionBtn = document.getElementById('cancel-question-btn');
     
-    // DOM elements - Question Discussion View
-    const questionDiscussionView = document.getElementById('question-discussion-view');
+    // DOM elements - Question Detail
     const backToAssignmentBtn = document.getElementById('back-to-assignment-btn');
-    const questionDiscussionTitle = document.getElementById('question-discussion-title');
+    const questionTitle = document.getElementById('question-title');
     const questionContent = document.getElementById('question-content');
-    const discussionMessages = document.getElementById('discussion-messages');
-    const discussionMessageInput = document.getElementById('discussion-message-input');
-    const sendDiscussionBtn = document.getElementById('send-discussion-btn');
+    const groupchatMessages = document.getElementById('groupchat-messages');
+    const groupchatInputField = document.getElementById('groupchat-input-field');
+    const sendGroupchatBtn = document.getElementById('send-groupchat-btn');
     
-    // State variables
-    let isEditMode = false;
+    // Current state
     let currentClassId = null;
     let currentAssignmentId = null;
     let currentQuestionId = null;
     
-    // Load classes from storage
+    // Mock data
+    const mockData = {
+      classes: [
+        {
+          id: 1,
+          name: "Computer Science 101",
+          url: "https://example.com/cs101",
+          assignments: [
+            {
+              id: 101,
+              title: "Introduction to Algorithms",
+              dueDate: "2025-03-15",
+              description: "Implement three basic sorting algorithms (bubble sort, insertion sort, and selection sort) in the language of your choice. Analyze their time and space complexity.",
+              questions: [
+                {
+                  id: 1001,
+                  title: "How to start with bubble sort?",
+                  content: "I'm having trouble understanding how the bubble sort algorithm works. Can someone explain the basic concept?",
+                  author: "Student1",
+                  date: "2025-02-28",
+                  messages: [
+                    { author: "Student2", content: "Bubble sort works by repeatedly stepping through the list, comparing adjacent elements and swapping them if they're in the wrong order.", date: "2025-02-28" },
+                    { author: "Instructor", content: "Here's a simple visualization: imagine bubbles in water rising to the surface. Heavier elements 'sink' while lighter ones 'rise' to their correct positions.", date: "2025-03-01" },
+                    { author: "Student1", content: "That makes sense! So in each pass, the largest unsorted element 'bubbles up' to its correct position?", date: "2025-03-01" }
+                  ]
+                },
+                {
+                  id: 1002,
+                  title: "Insertion sort vs Selection sort",
+                  content: "What are the main differences between insertion sort and selection sort in terms of performance?",
+                  author: "Student3",
+                  date: "2025-03-01",
+                  messages: [
+                    { author: "Student4", content: "Insertion sort is usually more efficient for small or mostly sorted arrays, while selection sort performs the same regardless of input arrangement.", date: "2025-03-01" },
+                    { author: "Student3", content: "Thanks! Do they have the same worst-case time complexity?", date: "2025-03-01" },
+                    { author: "Instructor", content: "Yes, both have O(n²) worst-case time complexity, but insertion sort's best case is O(n) when the array is already sorted.", date: "2025-03-02" }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 102,
+              title: "Binary Search Trees",
+              dueDate: "2025-03-22",
+              description: "Implement a binary search tree with insert, delete, and search operations. Write a function to traverse the tree in-order, pre-order, and post-order.",
+              questions: [
+                {
+                  id: 1003,
+                  title: "Balancing BST",
+                  content: "Does our implementation need to handle tree balancing? Or is a simple BST sufficient?",
+                  author: "Student5",
+                  date: "2025-03-02",
+                  messages: [
+                    { author: "Instructor", content: "A simple BST is sufficient for this assignment. We'll cover AVL trees and Red-Black trees in a future lesson.", date: "2025-03-02" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: "Mathematics 202",
+          url: "https://example.com/math202",
+          assignments: [
+            {
+              id: 201,
+              title: "Linear Algebra Problem Set",
+              dueDate: "2025-03-10",
+              description: "Complete problems 1-15 in Chapter 3 of the textbook. Focus on eigenvalues and eigenvectors.",
+              questions: [
+                {
+                  id: 2001,
+                  title: "Trouble with Problem 7",
+                  content: "I'm stuck on problem 7 about finding eigenvalues for a 3x3 matrix. Any hints?",
+                  author: "Student2",
+                  date: "2025-02-27",
+                  messages: [
+                    { author: "Student6", content: "Remember to first find the characteristic polynomial by calculating det(A - λI).", date: "2025-02-27" },
+                    { author: "Student2", content: "I got the polynomial, but I'm having trouble factoring it.", date: "2025-02-28" },
+                    { author: "Instructor", content: "Try substituting some simple values first. Notice that λ=1 is a root, which should simplify your factoring.", date: "2025-02-28" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 3,
+          name: "Physics 110",
+          url: "https://example.com/physics110",
+          assignments: [
+            {
+              id: 301,
+              title: "Mechanics Lab Report",
+              dueDate: "2025-03-18",
+              description: "Write a lab report on the pendulum experiment conducted in class. Include your data, calculations, and analysis of experimental error.",
+              questions: [
+                {
+                  id: 3001,
+                  title: "Format for error analysis",
+                  content: "What's the preferred format for presenting the error analysis in our lab reports?",
+                  author: "Student7",
+                  date: "2025-03-01",
+                  messages: [
+                    { author: "Instructor", content: "Include both absolute and percentage errors. You can use a table to compare theoretical and experimental values, with a column for percentage difference.", date: "2025-03-01" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 4,
+          name: "English Literature",
+          url: "https://example.com/english",
+          assignments: [
+            {
+              id: 401,
+              title: "Shakespeare Analysis Essay",
+              dueDate: "2025-03-25",
+              description: "Write a 5-page analysis of the theme of ambition in Macbeth. Use at least three scholarly sources to support your arguments.",
+              questions: [
+                {
+                  id: 4001,
+                  title: "Citation format",
+                  content: "Should we use MLA or Chicago style for citations in this essay?",
+                  author: "Student8",
+                  date: "2025-02-26",
+                  messages: [
+                    { author: "Instructor", content: "Please use MLA format for this assignment. Remember to include a works cited page at the end.", date: "2025-02-26" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    
+    // AI chat responses (mock)
+    const aiResponses = {
+      "Computer Science 101": [
+        "Sorting algorithms form the foundation of many computer science concepts. What specific aspect would you like to learn about?",
+        "Binary search trees are efficient data structures for searching. The average time complexity for operations is O(log n).",
+        "The key difference between time and space complexity is that time complexity measures the running time of an algorithm, while space complexity measures the memory usage."
+      ],
+      "Mathematics 202": [
+        "Linear algebra has many applications in machine learning, particularly in understanding transformations and dimensionality reduction.",
+        "When finding eigenvalues, remember that they're the values of λ that satisfy the equation det(A - λI) = 0.",
+        "Matrices represent linear transformations. Each eigenvalue and eigenvector pair tells you a direction in which the transformation acts as a simple scaling."
+      ],
+      "Physics 110": [
+        "In physics, error analysis is crucial because no measurement is perfect. Both systematic and random errors must be accounted for.",
+        "The period of a pendulum is proportional to the square root of its length, assuming small angle approximations.",
+        "When analyzing experimental data, statistical methods help determine if your results are significant."
+      ],
+      "English Literature": [
+        "In Macbeth, ambition serves as both a driving force and a destructive element. Consider how Shakespeare portrays the consequences of unchecked ambition.",
+        "Literary analysis should balance close reading of the text with broader contextual understanding.",
+        "MLA format requires in-text citations with author's last name and page number (Smith 45)."
+      ]
+    };
+    
+    // Initialize the extension
     loadClasses();
     
-    // Main View event listeners
-    addClassBtn.addEventListener('click', showAddClassForm);
-    editModeBtn.addEventListener('click', toggleEditMode);
-    saveClassBtn.addEventListener('click', saveClass);
-    cancelBtn.addEventListener('click', hideAddClassForm);
-    
-    // Class Detail View event listeners
-    backBtn.addEventListener('click', showMainView);
-    tabButtons.forEach(button => {
-      button.addEventListener('click', () => switchTab(button.dataset.tab));
+    // Button event listeners
+    backBtn.addEventListener('click', showClassesList);
+    backToClassBtn.addEventListener('click', function() {
+      showClassDetail(currentClassId);
+    });
+    backToAssignmentBtn.addEventListener('click', function() {
+      showAssignmentDetail(currentClassId, currentAssignmentId);
     });
     
-    // Assignments Tab event listeners
-    addAssignmentBtn.addEventListener('click', showAddAssignmentForm);
-    saveAssignmentBtn.addEventListener('click', saveAssignment);
-    cancelAssignmentBtn.addEventListener('click', hideAddAssignmentForm);
+    // Tab navigation
+    assignmentsTabBtn.addEventListener('click', function() {
+      showTab(assignmentsTab, assignmentsTabBtn);
+      hideTab(chatTab, chatTabBtn);
+    });
     
-    // AI Chat Tab event listeners
-    sendMessageBtn.addEventListener('click', sendChatMessage);
-    messageInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
+    chatTabBtn.addEventListener('click', function() {
+      showTab(chatTab, chatTabBtn);
+      hideTab(assignmentsTab, assignmentsTabBtn);
+    });
+    
+    // Chat functionality
+    sendChatBtn.addEventListener('click', sendChatMessage);
+    chatInputField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         sendChatMessage();
       }
     });
     
-    // Assignment Detail View event listeners
-    backToAssignmentsBtn.addEventListener('click', showAssignmentsTab);
-    addQuestionBtn.addEventListener('click', showAddQuestionForm);
-    postQuestionBtn.addEventListener('click', postQuestion);
-    cancelQuestionBtn.addEventListener('click', hideAddQuestionForm);
+    // Question posting
+    postQuestionBtn.addEventListener('click', postNewQuestion);
     
-    // Question Discussion View event listeners
-    backToAssignmentBtn.addEventListener('click', showAssignmentDetail);
-    sendDiscussionBtn.addEventListener('click', sendDiscussionMessage);
-    discussionMessageInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendDiscussionMessage();
+    // Groupchat functionality
+    sendGroupchatBtn.addEventListener('click', sendGroupchatMessage);
+    groupchatInputField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendGroupchatMessage();
       }
     });
     
-    // Navigation functions
-    function showMainView() {
-      mainView.classList.remove('hidden');
-      classDetailView.classList.add('hidden');
-      assignmentDetailView.classList.add('hidden');
-      questionDiscussionView.classList.add('hidden');
-      currentClassId = null;
-    }
-    
-    function showClassDetail(classId) {
-      const classes = getClasses();
-      const classItem = classes.find(c => c.id === classId);
-      
-      if (classItem) {
-        currentClassId = classId;
-        classDetailTitle.textContent = classItem.name;
-        
-        mainView.classList.add('hidden');
-        classDetailView.classList.remove('hidden');
-        assignmentDetailView.classList.add('hidden');
-        questionDiscussionView.classList.add('hidden');
-        
-        // Show assignments tab by default
-        switchTab('assignments');
-        loadAssignments(classId);
-      }
-    }
-    
-    function showAssignmentsTab() {
-      assignmentDetailView.classList.add('hidden');
-      questionDiscussionView.classList.add('hidden');
-      assignmentsTab.classList.remove('hidden');
-      
-      // Reset current selections
-      currentAssignmentId = null;
-      currentQuestionId = null;
-      
-      switchTab('assignments');
-    }
-    
-    function showAssignmentDetail(assignmentId) {
-      if (!assignmentId && currentAssignmentId) {
-        assignmentId = currentAssignmentId;
-      }
-      
-      const assignments = getAssignments(currentClassId);
-      const assignment = assignments.find(a => a.id === assignmentId);
-      
-      if (assignment) {
-        currentAssignmentId = assignmentId;
-        assignmentDetailTitle.textContent = assignment.title;
-        
-        // Format due date
-        const dueDate = new Date(assignment.dueDate);
-        const formattedDate = dueDate.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-        
-        assignmentDetailContent.innerHTML = `
-          <div class="assignment-info">
-            <p><strong>Due Date:</strong> ${formattedDate}</p>
-            <p><strong>Description:</strong></p>
-            <p>${assignment.description || 'No description provided.'}</p>
-          </div>
-        `;
-        
-        assignmentsTab.classList.add('hidden');
-        assignmentDetailView.classList.remove('hidden');
-        
-        loadQuestions(assignmentId);
-      }
-    }
-    
-    function showQuestionDiscussion(questionId) {
-      const questions = getQuestions(currentAssignmentId);
-      const question = questions.find(q => q.id === questionId);
-      
-      if (question) {
-        currentQuestionId = questionId;
-        questionDiscussionTitle.textContent = question.text.substring(0, 50) + (question.text.length > 50 ? '...' : '');
-        
-        // Format date
-        const timestamp = new Date(question.timestamp);
-        const formattedDate = timestamp.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
-        questionContent.innerHTML = `
-          <div class="question-info">
-            <p class="question-text">${question.text}</p>
-            <p class="question-meta">Asked by ${question.author || 'Anonymous'} on ${formattedDate}</p>
-          </div>
-        `;
-        
-        assignmentDetailView.classList.add('hidden');
-        questionDiscussionView.classList.remove('hidden');
-        
-        loadDiscussionMessages(questionId);
-      }
-    }
-    
-    // Tab switching
-    function switchTab(tabName) {
-      // Update tab buttons
-      tabButtons.forEach(button => {
-        if (button.dataset.tab === tabName) {
-          button.classList.add('active');
-        } else {
-          button.classList.remove('active');
-        }
-      });
-      
-      // Update tab contents
-      tabContents.forEach(content => {
-        if (content.id === `${tabName}-tab`) {
-          content.classList.add('active');
-          content.classList.remove('hidden');
-        } else {
-          content.classList.remove('active');
-          content.classList.add('hidden');
-        }
-      });
-      
-      // Load content based on tab
-      if (tabName === 'assignments') {
-        loadAssignments(currentClassId);
-      } else if (tabName === 'ai-chat') {
-        loadChatMessages(currentClassId);
-      }
-    }
-    
-    // Edit mode toggle
-    function toggleEditMode() {
-      isEditMode = !isEditMode;
-      
-      if (isEditMode) {
-        document.body.classList.add('edit-mode');
-        editModeBtn.textContent = 'Done Editing';
-      } else {
-        document.body.classList.remove('edit-mode');
-        editModeBtn.textContent = 'Edit Mode';
-      }
-      
-      // Reload classes to update UI
-      loadClasses();
-    }
-    
-    // Form visibility functions
-    function showAddClassForm() {
-      addClassForm.classList.remove('hidden');
-      classNameInput.focus();
-    }
-    
-    function hideAddClassForm() {
-      addClassForm.classList.add('hidden');
-      classNameInput.value = '';
-      classUrlInput.value = '';
-    }
-    
-    function showAddAssignmentForm() {
-      addAssignmentForm.classList.remove('hidden');
-      assignmentTitleInput.focus();
-    }
-    
-    function hideAddAssignmentForm() {
-      addAssignmentForm.classList.add('hidden');
-      assignmentTitleInput.value = '';
-      assignmentDueDateInput.value = '';
-      assignmentDescriptionInput.value = '';
-    }
-    
-    function showAddQuestionForm() {
-      addQuestionForm.classList.remove('hidden');
-      questionTextInput.focus();
-    }
-    
-    function hideAddQuestionForm() {
-      addQuestionForm.classList.add('hidden');
-      questionTextInput.value = '';
-    }
-    
-    // Data loading functions
+    // Load classes from mock data
     function loadClasses() {
-      chrome.storage.sync.get('classes', function(data) {
-        const classes = data.classes || getDefaultClasses();
-        renderClasses(classes);
-        
-        // Save default classes if none exist
-        if (!data.classes) {
-          chrome.storage.sync.set({ 'classes': classes });
-        }
-      });
+      const classes = mockData.classes;
+      renderClasses(classes);
     }
     
-    function loadAssignments(classId) {
-      if (!classId) return;
-      
-      const assignments = getAssignments(classId);
-      renderAssignments(assignments);
-    }
-    
-    function loadQuestions(assignmentId) {
-      if (!assignmentId) return;
-      
-      const questions = getQuestions(assignmentId);
-      renderQuestions(questions);
-    }
-    
-    function loadChatMessages(classId) {
-      if (!classId) return;
-      
-      const messages = getChatMessages(classId);
-      renderChatMessages(messages);
-    }
-    
-    function loadDiscussionMessages(questionId) {
-      if (!questionId) return;
-      
-      const messages = getDiscussionMessages(questionId);
-      renderDiscussionMessages(messages);
-    }
-    
-    // Render functions
+    // Render classes in the side panel
     function renderClasses(classes) {
       classesContainer.innerHTML = '';
       
       classes.forEach(function(classItem) {
         const classElement = document.createElement('div');
         classElement.className = 'class-item';
-        classElement.dataset.id = classItem.id;
         classElement.innerHTML = `
           <span class="class-name">${classItem.name}</span>
-          ${isEditMode ? `<button class="delete-btn" data-id="${classItem.id}">Delete</button>` : ''}
         `;
         
-        // Open class detail when clicked (unless in edit mode)
-        classElement.addEventListener('click', function(e) {
-          if (!isEditMode && e.target.className !== 'delete-btn') {
-            showClassDetail(classItem.id);
-          }
+        // Open class detail when clicked
+        classElement.addEventListener('click', function() {
+          showClassDetail(classItem.id);
         });
         
         classesContainer.appendChild(classElement);
       });
-      
-      // Add delete button event listeners
-      document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const id = this.getAttribute('data-id');
-          deleteClass(id);
-        });
-      });
     }
     
+    // Show class detail view
+    function showClassDetail(classId) {
+      currentClassId = classId;
+      const classData = mockData.classes.find(c => c.id === classId);
+      
+      if (!classData) return;
+      
+      // Hide other views
+      classesContainer.classList.add('hidden');
+      assignmentDetail.classList.add('hidden');
+      questionDetail.classList.add('hidden');
+      
+      // Show class detail
+      classDetail.classList.remove('hidden');
+      classTitle.textContent = classData.name;
+      
+      // Default to assignments tab
+      showTab(assignmentsTab, assignmentsTabBtn);
+      hideTab(chatTab, chatTabBtn);
+      
+      // Render assignments
+      renderAssignments(classData.assignments);
+      
+      // Clear chat
+      chatMessages.innerHTML = '';
+      chatInputField.value = '';
+    }
+    
+    // Show tab and highlight button
+    function showTab(tabElement, buttonElement) {
+      tabElement.classList.remove('hidden');
+      buttonElement.classList.add('active');
+    }
+    
+    // Hide tab and remove button highlight
+    function hideTab(tabElement, buttonElement) {
+      tabElement.classList.add('hidden');
+      buttonElement.classList.remove('active');
+    }
+    
+    // Render assignments for a class
     function renderAssignments(assignments) {
       assignmentsList.innerHTML = '';
       
-      if (assignments.length === 0) {
-        assignmentsList.innerHTML = '<p class="empty-message">No assignments yet. Add your first assignment!</p>';
-        return;
-      }
-      
       assignments.forEach(function(assignment) {
-        const dueDate = new Date(assignment.dueDate);
-        const formattedDate = dueDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        });
-        
         const assignmentElement = document.createElement('div');
         assignmentElement.className = 'assignment-item';
-        assignmentElement.dataset.id = assignment.id;
         assignmentElement.innerHTML = `
-          <div class="assignment-info">
-            <span class="assignment-title">${assignment.title}</span>
-            <span class="assignment-due-date">Due: ${formattedDate}</span>
-          </div>
-          <button class="delete-assignment-btn" data-id="${assignment.id}">×</button>
+          <div class="assignment-name">${assignment.title}</div>
+          <div class="assignment-due">Due: ${formatDate(assignment.dueDate)}</div>
         `;
         
-        assignmentElement.addEventListener('click', function(e) {
-          if (e.target.className !== 'delete-assignment-btn') {
-            showAssignmentDetail(assignment.id);
-          }
+        // Open assignment detail when clicked
+        assignmentElement.addEventListener('click', function() {
+          showAssignmentDetail(currentClassId, assignment.id);
         });
         
         assignmentsList.appendChild(assignmentElement);
       });
-      
-      // Add delete button event listeners
-      document.querySelectorAll('.delete-assignment-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const id = this.getAttribute('data-id');
-          deleteAssignment(id);
-        });
-      });
     }
     
+    // Show assignment detail view
+    function showAssignmentDetail(classId, assignmentId) {
+      currentClassId = classId;
+      currentAssignmentId = assignmentId;
+      
+      const classData = mockData.classes.find(c => c.id === classId);
+      if (!classData) return;
+      
+      const assignmentData = classData.assignments.find(a => a.id === assignmentId);
+      if (!assignmentData) return;
+      
+      // Hide other views
+      classesContainer.classList.add('hidden');
+      classDetail.classList.add('hidden');
+      questionDetail.classList.add('hidden');
+      
+      // Show assignment detail
+      assignmentDetail.classList.remove('hidden');
+      assignmentTitle.textContent = assignmentData.title;
+      assignmentDescription.textContent = assignmentData.description;
+      
+      // Render questions
+      renderQuestions(assignmentData.questions);
+    }
+    
+    // Render questions for an assignment
     function renderQuestions(questions) {
-      questionsList.innerHTML = '';
+      questionsContainer.innerHTML = '';
       
       if (questions.length === 0) {
-        questionsList.innerHTML = '<p class="empty-message">No questions yet. Be the first to ask!</p>';
+        questionsContainer.innerHTML = '<p>No questions yet. Be the first to ask!</p>';
         return;
       }
       
       questions.forEach(function(question) {
-        const timestamp = new Date(question.timestamp);
-        const formattedDate = timestamp.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        });
-        
         const questionElement = document.createElement('div');
         questionElement.className = 'question-item';
-        questionElement.dataset.id = question.id;
         questionElement.innerHTML = `
-          <div class="question-preview">
-            <span class="question-text">${question.text.substring(0, 60)}${question.text.length > 60 ? '...' : ''}</span>
-            <div class="question-meta">
-              <span class="question-author">${question.author || 'Anonymous'}</span>
-              <span class="question-date">${formattedDate}</span>
-              <span class="question-replies">${(question.replies || 0)} replies</span>
-            </div>
-          </div>
+          <div class="question-title">${question.title}</div>
+          <div class="question-meta">Asked by ${question.author} on ${formatDate(question.date)}</div>
         `;
         
+        // Open question detail when clicked
         questionElement.addEventListener('click', function() {
-          showQuestionDiscussion(question.id);
+          showQuestionDetail(currentClassId, currentAssignmentId, question.id);
         });
         
-        questionsList.appendChild(questionElement);
+        questionsContainer.appendChild(questionElement);
       });
     }
     
-    function renderChatMessages(messages) {
-      chatMessages.innerHTML = '';
+    // Show question detail view
+    function showQuestionDetail(classId, assignmentId, questionId) {
+      currentClassId = classId;
+      currentAssignmentId = assignmentId;
+      currentQuestionId = questionId;
       
-      if (messages.length === 0) {
-        // Add welcome message from AI
-        const welcomeMessage = {
-          sender: 'ai',
-          text: `Hello! I'm your AI assistant for this class. How can I help you today?`,
-          timestamp: new Date().toISOString()
-        };
-        
-        messages.push(welcomeMessage);
-        saveChatMessages(currentClassId, messages);
-      }
+      const classData = mockData.classes.find(c => c.id === classId);
+      if (!classData) return;
       
-      messages.forEach(function(message) {
-        const timestamp = new Date(message.timestamp);
-        const formattedTime = timestamp.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${message.sender}-message`;
-        messageElement.innerHTML = `
-          <div class="message-content">
-            <p>${message.text}</p>
-            <span class="message-time">${formattedTime}</span>
-          </div>
-        `;
-        
-        chatMessages.appendChild(messageElement);
-      });
+      const assignmentData = classData.assignments.find(a => a.id === assignmentId);
+      if (!assignmentData) return;
       
-      // Scroll to bottom
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      const questionData = assignmentData.questions.find(q => q.id === questionId);
+      if (!questionData) return;
+      
+      // Hide other views
+      classesContainer.classList.add('hidden');
+      classDetail.classList.add('hidden');
+      assignmentDetail.classList.add('hidden');
+      
+      // Show question detail
+      questionDetail.classList.remove('hidden');
+      questionTitle.textContent = questionData.title;
+      questionContent.textContent = questionData.content;
+      
+      // Render group chat messages
+      renderGroupchatMessages(questionData.messages);
     }
     
-    function renderDiscussionMessages(messages) {
-      discussionMessages.innerHTML = '';
+    // Render group chat messages
+    function renderGroupchatMessages(messages) {
+      groupchatMessages.innerHTML = '';
       
-      if (messages.length === 0) {
-        discussionMessages.innerHTML = '<p class="empty-message">No replies yet. Start the discussion!</p>';
+      if (!messages || messages.length === 0) {
+        groupchatMessages.innerHTML = '<p>No messages yet. Start the discussion!</p>';
         return;
       }
       
       messages.forEach(function(message) {
-        const timestamp = new Date(message.timestamp);
-        const formattedTime = timestamp.toLocaleString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
         const messageElement = document.createElement('div');
-        messageElement.className = 'discussion-message';
+        messageElement.className = 'message other-message';
         messageElement.innerHTML = `
-          <div class="message-content">
-            <div class="message-header">
-              <span class="message-author">${message.author || 'Anonymous'}</span>
-              <span class="message-time">${formattedTime}</span>
-            </div>
-            <p>${message.text}</p>
-          </div>
+          <div class="message-author">${message.author}</div>
+          <div class="message-content">${message.content}</div>
+          <div class="message-date">${formatDate(message.date)}</div>
         `;
         
-        discussionMessages.appendChild(messageElement);
+        groupchatMessages.appendChild(messageElement);
       });
       
       // Scroll to bottom
-      discussionMessages.scrollTop = discussionMessages.scrollHeight;
+      groupchatMessages.scrollTop = groupchatMessages.scrollHeight;
     }
     
-    // Data manipulation functions
-    function saveClass() {
-      const name = classNameInput.value.trim();
-      let url = classUrlInput.value.trim();
-      
-      if (name === '') {
-        return;
-      }
-      
-      // Add http:// if missing
-      if (url !== '' && !url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-      
-      chrome.storage.sync.get('classes', function(data) {
-        const classes = data.classes || [];
-        const newClass = {
-          id: generateId(),
-          name,
-          url: url || '#'
-        };
-        
-        classes.push(newClass);
-        
-        chrome.storage.sync.set({ 'classes': classes }, function() {
-          renderClasses(classes);
-          hideAddClassForm();
-        });
-      });
-    }
-    
-    function deleteClass(id) {
-      chrome.storage.sync.get('classes', function(data) {
-        const classes = data.classes || [];
-        const updatedClasses = classes.filter(classItem => classItem.id !== id);
-        
-        chrome.storage.sync.set({ 'classes': updatedClasses }, function() {
-          renderClasses(updatedClasses);
-        });
-      });
-    }
-    
-    function saveAssignment() {
-      const title = assignmentTitleInput.value.trim();
-      const dueDate = assignmentDueDateInput.value;
-      const description = assignmentDescriptionInput.value.trim();
-      
-      if (title === '' || dueDate === '') {
-        return;
-      }
-      
-      const assignments = getAssignments(currentClassId);
-      const newAssignment = {
-        id: generateId(),
-        title,
-        dueDate,
-        description,
-        classId: currentClassId
-      };
-      
-      assignments.push(newAssignment);
-      saveAssignments(currentClassId, assignments);
-      
-      renderAssignments(assignments);
-      hideAddAssignmentForm();
-    }
-    
-    function deleteAssignment(id) {
-      const assignments = getAssignments(currentClassId);
-      const updatedAssignments = assignments.filter(assignment => assignment.id !== id);
-      
-      saveAssignments(currentClassId, updatedAssignments);
-      renderAssignments(updatedAssignments);
-    }
-    
-    function postQuestion() {
-      const text = questionTextInput.value.trim();
-      
-      if (text === '') {
-        return;
-      }
-      
-      const questions = getQuestions(currentAssignmentId);
-      const newQuestion = {
-        id: generateId(),
-        text,
-        author: 'You', // In a real app, you'd get the user's name
-        timestamp: new Date().toISOString(),
-        assignmentId: currentAssignmentId,
-        replies: 0
-      };
-      
-      questions.push(newQuestion);
-      saveQuestions(currentAssignmentId, questions);
-      
-      renderQuestions(questions);
-      hideAddQuestionForm();
-    }
-    
+    // Send a chat message to AI
     function sendChatMessage() {
-      const text = messageInput.value.trim();
-      
-      if (text === '') {
-        return;
-      }
-      
-      const messages = getChatMessages(currentClassId);
+      const message = chatInputField.value.trim();
+      if (message === '') return;
       
       // Add user message
-      const userMessage = {
-        sender: 'user',
-        text,
-        timestamp: new Date().toISOString()
-      };
+      const userMessageElement = document.createElement('div');
+      userMessageElement.className = 'message user-message';
+      userMessageElement.innerHTML = `
+        <div class="message-content">${message}</div>
+        <div class="message-date">Just now</div>
+      `;
+      chatMessages.appendChild(userMessageElement);
       
-      messages.push(userMessage);
+      // Clear input
+      chatInputField.value = '';
       
-      // For demo purposes, add an AI response
-      // In a real app, you'd call an AI API here
-      setTimeout(() => {
-        const aiResponse = {
-          sender: 'ai',
-          text: generateAIResponse(text),
-          timestamp: new Date().toISOString()
-        };
+      // Get class name for AI response
+      const classData = mockData.classes.find(c => c.id === currentClassId);
+      if (!classData) return;
+      
+      // Simulate AI response
+      setTimeout(function() {
+        const responses = aiResponses[classData.name];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
         
-        messages.push(aiResponse);
-        saveChatMessages(currentClassId, messages);
-        renderChatMessages(messages);
+        const aiMessageElement = document.createElement('div');
+        aiMessageElement.className = 'message ai-message';
+        aiMessageElement.innerHTML = `
+          <div class="message-author">AI Assistant</div>
+          <div class="message-content">${randomResponse}</div>
+          <div class="message-date">Just now</div>
+        `;
+        chatMessages.appendChild(aiMessageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       }, 1000);
-      
-      saveChatMessages(currentClassId, messages);
-      renderChatMessages(messages);
-      
-      messageInput.value = '';
     }
     
-    function sendDiscussionMessage() {
-      const text = discussionMessageInput.value.trim();
+    // Post a new question
+    function postNewQuestion() {
+      const questionText = newQuestionInput.value.trim();
+      if (questionText === '') return;
       
-      if (text === '') {
-        return;
-      }
-      
-      const messages = getDiscussionMessages(currentQuestionId);
-      const newMessage = {
-        id: generateId(),
-        text,
-        author: 'You', // In a real app, you'd get the user's name
-        timestamp: new Date().toISOString(),
-        questionId: currentQuestionId
+      // Create new question object
+      const newQuestion = {
+        id: Date.now(), // Use timestamp as ID
+        title: questionText.split('\n')[0] || 'New Question',
+        content: questionText,
+        author: "You",
+        date: new Date().toISOString().split('T')[0],
+        messages: []
       };
       
-      messages.push(newMessage);
+      // Add to mock data
+      const classData = mockData.classes.find(c => c.id === currentClassId);
+      if (!classData) return;
       
-      // Update reply count for the question
-      const questions = getQuestions(currentAssignmentId);
-      const question = questions.find(q => q.id === currentQuestionId);
-      if (question) {
-        question.replies = (question.replies || 0) + 1;
-        saveQuestions(currentAssignmentId, questions);
-      }
+      const assignmentData = classData.assignments.find(a => a.id === currentAssignmentId);
+      if (!assignmentData) return;
       
-      saveDiscussionMessages(currentQuestionId, messages);
-      renderDiscussionMessages(messages);
+      assignmentData.questions.push(newQuestion);
       
-      discussionMessageInput.value = '';
+      // Re-render questions
+      renderQuestions(assignmentData.questions);
+      
+      // Clear input
+      newQuestionInput.value = '';
     }
     
-    // Storage helper functions
-    function getClasses() {
-      const classes = localStorage.getItem('classes');
-      return classes ? JSON.parse(classes) : getDefaultClasses();
+    // Send a group chat message
+    function sendGroupchatMessage() {
+      const message = groupchatInputField.value.trim();
+      if (message === '') return;
+      
+      // Get current question data
+      const classData = mockData.classes.find(c => c.id === currentClassId);
+      if (!classData) return;
+      
+      const assignmentData = classData.assignments.find(a => a.id === currentAssignmentId);
+      if (!assignmentData) return;
+      
+      const questionData = assignmentData.questions.find(q => q.id === currentQuestionId);
+      if (!questionData) return;
+      
+      // Create new message
+      const newMessage = {
+        author: "You",
+        content: message,
+        date: new Date().toISOString().split('T')[0]
+      };
+      
+      // Add to mock data
+      questionData.messages.push(newMessage);
+      
+      // Re-render messages
+      renderGroupchatMessages(questionData.messages);
+      
+      // Clear input
+      groupchatInputField.value = '';
     }
     
-    function getDefaultClasses() {
-      return [
-        { id: generateId(), name: "Computer Science 101", url: "https://example.com/cs101" },
-        { id: generateId(), name: "Mathematics 202", url: "https://example.com/math202" },
-        { id: generateId(), name: "Physics 110", url: "https://example.com/physics110" },
-        { id: generateId(), name: "English Literature", url: "https://example.com/english" }
-      ];
+    // Show the classes list (return to main view)
+    function showClassesList() {
+      classesContainer.classList.remove('hidden');
+      classDetail.classList.add('hidden');
+      assignmentDetail.classList.add('hidden');
+      questionDetail.classList.add('hidden');
     }
     
-    function getAssignments(classId) {
-      const key = `assignments_${classId}`;
-      const assignments = localStorage.getItem(key);
-      return assignments ? JSON.parse(assignments) : getDefaultAssignments(classId);
+    // Format date for display
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
     }
-    
-    function getDefaultAssignments(classId) {
-      return [
-        {
-          id: generateId(),
-          title: "Midterm Project",
-          dueDate: "2023-11-15",
-          description: "Complete the midterm project as described in the syllabus.",
-          classId: classId
-        },
-        {
-          id: generateId(),
-          title: "Weekly Problem Set",
-          dueDate: "2023-10-20",
-          description: "Complete problems 1-10 on page 75 of the textbook.",
-          classId: classId
-        }
-      ];
-    }
-    
-    function getQuestions(assignmentId) {
-        const key = `questions_${assignmentId}`;
-        const questions = localStorage.getItem(key);
-        return questions ? JSON.parse(questions) : [];
-      }
-      
-      function getChatMessages(classId) {
-        const key = `chat_${classId}`;
-        const messages = localStorage.getItem(key);
-        return messages ? JSON.parse(messages) : [];
-      }
-      
-      function getDiscussionMessages(questionId) {
-        const key = `discussion_${questionId}`;
-        const messages = localStorage.getItem(key);
-        return messages ? JSON.parse(messages) : [];
-      }
-      
-      function saveAssignments(classId, assignments) {
-        const key = `assignments_${classId}`;
-        localStorage.setItem(key, JSON.stringify(assignments));
-      }
-      
-      function saveQuestions(assignmentId, questions) {
-        const key = `questions_${assignmentId}`;
-        localStorage.setItem(key, JSON.stringify(questions));
-      }
-      
-      function saveChatMessages(classId, messages) {
-        const key = `chat_${classId}`;
-        localStorage.setItem(key, JSON.stringify(messages));
-      }
-      
-      function saveDiscussionMessages(questionId, messages) {
-        const key = `discussion_${questionId}`;
-        localStorage.setItem(key, JSON.stringify(messages));
-      }
-      
-      // Utility functions
-      function generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
-      }
-      
-      function generateAIResponse(message) {
-        // Mock AI responses - in a real app, you'd call an AI API
-        const responses = [
-          "That's a great question! Based on the course material, I'd suggest reviewing chapter 5 in the textbook.",
-          "Let me help you with that. This concept relates to what we covered in last week's lecture about problem-solving strategies.",
-          "I understand your question. Have you tried applying the formula we discussed in class? It might help solve this particular problem.",
-          "Good question! This is a common area of confusion. The key thing to remember is how these concepts connect to the larger framework we've been studying.",
-          "I'd approach this problem by breaking it down into smaller steps. First, identify the variables, then apply the relevant principles we've discussed."
-        ];
-        
-        return responses[Math.floor(Math.random() * responses.length)];
-      }
-      
-      // Initialize localStorage from Chrome storage on first load
-      function initializeFromChromeStorage() {
-        chrome.storage.sync.get('classes', function(data) {
-          if (data.classes) {
-            localStorage.setItem('classes', JSON.stringify(data.classes));
-          }
-        });
-      }
-      
-      // Call initialization function
-      initializeFromChromeStorage();
-    });
+  });

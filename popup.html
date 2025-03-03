@@ -5,19 +5,23 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="popup-container">
-    <h1>Class Tracker</h1>
-    <p>Quick actions:</p>
+  <div class="container">
+    <h1>My Classes</h1>
     
-    <button id="open-side-panel">Open Side Panel</button>
-    <button id="add-current-page">Add Current Page as Class</button>
+    <div id="classes-container">
+      <!-- Classes will be loaded here -->
+    </div>
     
-    <div id="quick-classes">
-      <!-- Quick class access buttons will appear here -->
-      <p>Recent classes:</p>
-      <div id="recent-classes-list">
-        <!-- Will be populated by JavaScript -->
-      </div>
+    <div class="settings">
+      <button id="add-class-btn">Add New Class</button>
+      <button id="edit-mode-btn">Edit Mode</button>
+    </div>
+    
+    <div id="add-class-form" class="hidden">
+      <input type="text" id="class-name" placeholder="Class Name">
+      <input type="text" id="class-url" placeholder="Class URL">
+      <button id="save-class-btn">Save</button>
+      <button id="cancel-btn">Cancel</button>
     </div>
   </div>
   

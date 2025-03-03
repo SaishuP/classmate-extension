@@ -2,105 +2,104 @@
 <html>
 <head>
   <title>Class Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="sidepanel.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <div class="container">
-    <div id="main-view">
-      <h1>My Classes</h1>
-      
-      <div id="classes-container">
-        <!-- Classes will be loaded here -->
-      </div>
-      
-      <div class="settings">
-        <button id="add-class-btn">Add New Class</button>
-        <button id="edit-mode-btn">Edit Mode</button>
-      </div>
-      
-      <div id="add-class-form" class="hidden">
-        <input type="text" id="class-name" placeholder="Class Name">
-        <input type="text" id="class-url" placeholder="Class URL">
-        <button id="save-class-btn">Save</button>
-        <button id="cancel-btn">Cancel</button>
-      </div>
+    <h1><i class="fas fa-graduation-cap"></i> My Classes</h1>
+    
+    <div id="classes-container">
+      <!-- Classes will be loaded here -->
     </div>
-
-    <!-- Class detail view with tabs for assignments and AI chat -->
-    <div id="class-detail-view" class="hidden">
-      <div class="header">
-        <button id="back-btn">Back</button>
-        <h2 id="class-detail-title">Class Name</h2>
+    
+    <!-- Class detail view (assignments & chat) -->
+    <div id="class-detail" class="hidden">
+      <div class="detail-header">
+        <button id="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 id="class-title">Class Name</h2>
       </div>
-
-      <!-- Tab navigation -->
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="assignments">Assignments</button>
-        <button class="tab-btn" data-tab="ai-chat">AI Chat</button>
+      
+      <div class="tab-navigation">
+        <button id="assignments-tab-btn" class="tab-btn active">
+          <i class="fas fa-tasks"></i> Assignments
+        </button>
+        <button id="chat-tab-btn" class="tab-btn">
+          <i class="fas fa-robot"></i> AI Chat
+        </button>
       </div>
-
-      <!-- Assignments tab content -->
-      <div id="assignments-tab" class="tab-content active">
-        <div id="assignments-list">
+      
+      <div id="assignments-tab" class="tab-content">
+        <div class="assignments-list">
           <!-- Assignments will be loaded here -->
         </div>
-        <button id="add-assignment-btn">+ Add Assignment</button>
-        <div id="add-assignment-form" class="hidden">
-          <input type="text" id="assignment-title" placeholder="Assignment Title">
-          <input type="date" id="assignment-due-date">
-          <textarea id="assignment-description" placeholder="Description"></textarea>
-          <button id="save-assignment-btn">Save</button>
-          <button id="cancel-assignment-btn">Cancel</button>
-        </div>
       </div>
-
-      <!-- AI Chat tab content -->
-      <div id="ai-chat-tab" class="tab-content hidden">
-        <div id="chat-messages">
-          <!-- Chat messages will appear here -->
-        </div>
-        <div class="chat-input">
-          <textarea id="message-input" placeholder="Ask a question about this class..."></textarea>
-          <button id="send-message-btn">Send</button>
-        </div>
-      </div>
-
-      <!-- Assignment detail view -->
-      <div id="assignment-detail-view" class="hidden">
-        <div class="header">
-          <button id="back-to-assignments-btn">Back</button>
-          <h3 id="assignment-detail-title">Assignment Name</h3>
-        </div>
-        <div id="assignment-detail-content">
-          <!-- Assignment details -->
-        </div>
-        <div class="questions-section">
-          <h4>Questions</h4>
-          <div id="questions-list">
-            <!-- Questions will be loaded here -->
+      
+      <div id="chat-tab" class="tab-content hidden">
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages">
+            <!-- Chat messages will appear here -->
+            <div class="message ai-message">
+              <div class="message-author"><i class="fas fa-robot"></i> AI Assistant</div>
+              <div class="message-content">Hello! How can I help you with this class today?</div>
+              <div class="message-date">Just now</div>
+            </div>
           </div>
-          <button id="add-question-btn">+ Ask Question</button>
-          <div id="add-question-form" class="hidden">
-            <textarea id="question-text" placeholder="What's your question?"></textarea>
-            <button id="post-question-btn">Post</button>
-            <button id="cancel-question-btn">Cancel</button>
+          <div class="chat-input">
+            <textarea id="chat-input-field" placeholder="Ask the AI about this class..."></textarea>
+            <button id="send-chat-btn"><i class="fas fa-paper-plane"></i> Send</button>
           </div>
         </div>
       </div>
-
-      <!-- Question discussion view -->
-      <div id="question-discussion-view" class="hidden">
-        <div class="header">
-          <button id="back-to-assignment-btn">Back</button>
-          <h3 id="question-discussion-title">Question</h3>
+    </div>
+    
+    <!-- Assignment detail view with questions and group chat -->
+    <div id="assignment-detail" class="hidden">
+      <div class="detail-header">
+        <button id="back-to-class-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 id="assignment-title">Assignment Name</h2>
+      </div>
+      
+      <div class="assignment-info">
+        <div class="assignment-description" id="assignment-description">
+          Assignment description will appear here.
         </div>
-        <div id="question-content"></div>
-        <div id="discussion-messages">
-          <!-- Discussion messages will be loaded here -->
+      </div>
+      
+      <div class="questions-section">
+        <h3><i class="fas fa-question-circle"></i> Questions</h3>
+        <div id="questions-container">
+          <!-- Questions will be loaded here -->
         </div>
-        <div class="discussion-input">
-          <textarea id="discussion-message-input" placeholder="Add to the discussion..."></textarea>
-          <button id="send-discussion-btn">Send</button>
+        
+        <div class="new-question">
+          <textarea id="new-question-input" placeholder="Post a new question..."></textarea>
+          <button id="post-question-btn"><i class="fas fa-plus-circle"></i> Post Question</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Question detail view with group chat -->
+    <div id="question-detail" class="hidden">
+      <div class="detail-header">
+        <button id="back-to-assignment-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <h3 id="question-title">Question Title</h3>
+      </div>
+      
+      <div class="question-content" id="question-content">
+        Question content will appear here.
+      </div>
+      
+      <div class="groupchat-section">
+        <h3><i class="fas fa-comments"></i> Group Chat</h3>
+        <div id="groupchat-messages">
+          <!-- Group chat messages will appear here -->
+        </div>
+        
+        <div class="groupchat-input">
+          <textarea id="groupchat-input-field" placeholder="Type a message..."></textarea>
+          <button id="send-groupchat-btn"><i class="fas fa-paper-plane"></i> Send</button>
         </div>
       </div>
     </div>
