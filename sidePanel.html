@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Class Tracker</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="container">
+    <div id="main-view">
+      <h1>My Classes</h1>
+      
+      <div id="classes-container">
+        <!-- Classes will be loaded here -->
+      </div>
+      
+      <div class="settings">
+        <button id="add-class-btn">Add New Class</button>
+        <button id="edit-mode-btn">Edit Mode</button>
+      </div>
+      
+      <div id="add-class-form" class="hidden">
+        <input type="text" id="class-name" placeholder="Class Name">
+        <input type="text" id="class-url" placeholder="Class URL">
+        <button id="save-class-btn">Save</button>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Class detail view with tabs for assignments and AI chat -->
+    <div id="class-detail-view" class="hidden">
+      <div class="header">
+        <button id="back-btn">Back</button>
+        <h2 id="class-detail-title">Class Name</h2>
+      </div>
+
+      <!-- Tab navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="assignments">Assignments</button>
+        <button class="tab-btn" data-tab="ai-chat">AI Chat</button>
+      </div>
+
+      <!-- Assignments tab content -->
+      <div id="assignments-tab" class="tab-content active">
+        <div id="assignments-list">
+          <!-- Assignments will be loaded here -->
+        </div>
+        <button id="add-assignment-btn">+ Add Assignment</button>
+        <div id="add-assignment-form" class="hidden">
+          <input type="text" id="assignment-title" placeholder="Assignment Title">
+          <input type="date" id="assignment-due-date">
+          <textarea id="assignment-description" placeholder="Description"></textarea>
+          <button id="save-assignment-btn">Save</button>
+          <button id="cancel-assignment-btn">Cancel</button>
+        </div>
+      </div>
+
+      <!-- AI Chat tab content -->
+      <div id="ai-chat-tab" class="tab-content hidden">
+        <div id="chat-messages">
+          <!-- Chat messages will appear here -->
+        </div>
+        <div class="chat-input">
+          <textarea id="message-input" placeholder="Ask a question about this class..."></textarea>
+          <button id="send-message-btn">Send</button>
+        </div>
+      </div>
+
+      <!-- Assignment detail view -->
+      <div id="assignment-detail-view" class="hidden">
+        <div class="header">
+          <button id="back-to-assignments-btn">Back</button>
+          <h3 id="assignment-detail-title">Assignment Name</h3>
+        </div>
+        <div id="assignment-detail-content">
+          <!-- Assignment details -->
+        </div>
+        <div class="questions-section">
+          <h4>Questions</h4>
+          <div id="questions-list">
+            <!-- Questions will be loaded here -->
+          </div>
+          <button id="add-question-btn">+ Ask Question</button>
+          <div id="add-question-form" class="hidden">
+            <textarea id="question-text" placeholder="What's your question?"></textarea>
+            <button id="post-question-btn">Post</button>
+            <button id="cancel-question-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question discussion view -->
+      <div id="question-discussion-view" class="hidden">
+        <div class="header">
+          <button id="back-to-assignment-btn">Back</button>
+          <h3 id="question-discussion-title">Question</h3>
+        </div>
+        <div id="question-content"></div>
+        <div id="discussion-messages">
+          <!-- Discussion messages will be loaded here -->
+        </div>
+        <div class="discussion-input">
+          <textarea id="discussion-message-input" placeholder="Add to the discussion..."></textarea>
+          <button id="send-discussion-btn">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="sidepanel.js"></script>
+</body>
+</html>
